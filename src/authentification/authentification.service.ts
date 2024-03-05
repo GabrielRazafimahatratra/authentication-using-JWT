@@ -31,15 +31,15 @@ export class AuthentificationService {
         return {access_token : this.jwtService.sign(payload)};
     }
 
-    async register(user: RegisterRequestDto): Promise<AccessToken> {
+    async register(user: RegisterRequestDto): Promise<Users> {
         const utilisateurExistant = this.usersService.findOneUserByEmail(user.email);
         if (utilisateurExistant) {
             throw new BadRequestException('Email déjà existant');
         }
         const hashedPassword = await bcrypt.hash(user.password, 10);
         const nouveauUtilisateur: Users = { ...user, password: hashedPassword};
-        await this.usersService.createUser(nouveauUtilisateur);
-        return this.login(nouveauUtilisateur);
+        const utilisateurInscrit = await this.usersService.createUser(nouveauUtilisateur);
+        return utilisateurInscrit;
     }
 
     
